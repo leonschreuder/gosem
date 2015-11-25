@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"leonmoll.de/testutils"
 	"os"
 	"testing"
+
+	"leonmoll.de/testutils"
 )
 
 // INFO: Print tree with:  ast.Print(fset, ...)
@@ -23,6 +25,7 @@ func setup() {
 
 func teardown() {
 	os.Args = originalArgs
+	testutils.ResetMockPrinter()
 }
 
 func Test_main(t *testing.T) {
@@ -33,7 +36,19 @@ func Test_main(t *testing.T) {
 
 	main()
 
-	assertStringEqual(t, "Should have parsed input.go correctly", testutils.GetLastPrinted(), expected)
+	assertStringEqual(t, "Should have parsed input.go correctly", expected, testutils.GetLastPrinted())
+}
+
+func Test_main_shouldPrintErrorOnPanic(t *testing.T) {
+	defer teardown()
+	setup()
+	addToArgs("-f=error.go")
+	fmt.Println(os.Args)
+	expected := ""
+
+	main()
+
+	assertStringEqual(t, "Should have parsed input.go correctly", expected, testutils.GetLastPrinted())
 }
 
 func Test_getFileFromArgs_shouldReturnFileName(t *testing.T) {
@@ -93,7 +108,7 @@ func Test_getVariablesFromFunction_shouldReturnParameter(t *testing.T) {
 func someFunc(parameter string) {
 }`
 	funStmt, _ := parseSource(source).Decls[0].(*ast.FuncDecl)
-	ast.Print(fset, funStmt)
+	// ast.Print(fset, funStmt)
 
 	findParameters(funStmt.Type)
 

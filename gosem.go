@@ -10,6 +10,7 @@ import (
 )
 
 var fmtPrintf = fmt.Printf
+var fmtPrintln = fmt.Println
 var fileNamePtr *string
 var fset *token.FileSet
 var fileAst *ast.File
@@ -23,11 +24,18 @@ func init() {
 }
 
 func main() {
+	defer recoverPanicWhenThrown()
 	file := getFileFromArgs()
 
 	parseFile(file)
 	extractWantedFromAst()
 	printFound()
+}
+
+func recoverPanicWhenThrown() {
+	if r := recover(); r != nil {
+		fmtPrintln("Error: ", r)
+	}
 }
 
 func getFileFromArgs() string {
