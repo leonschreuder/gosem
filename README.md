@@ -5,4 +5,4 @@ go source file. This information can than be used with a semantic highlighter,
 like [vim-gosem][] for example.
 
 
-[vim-gosem]: github.com/meonlol/vim-gosem
+[vim-gosem]: https://github.com/meonlol/vim-gosem
